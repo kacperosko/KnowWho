@@ -1,0 +1,12 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+
+@layer components {
+
+    .errorlist {
+        @apply text-colors-red-500;
+        @apply py-3;
+    }
+}

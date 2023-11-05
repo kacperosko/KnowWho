@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Know Each Other - {% block title %}{% endblock %}</title>
+    <!-- Include Tailwind CSS -->
+{#    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">#}
+    <link rel="stylesheet" href="{% static '/style/tailwind-output.css' %}" >
+    <link href="/static/style/otu">
+
+</head>
+
+<body class="bg-purple__c">
+{% include 'include/header.html' %}
+<div>
+    {% block content %}{% endblock content %}
+</div>
+</body>
+
+{% block javascript %}
+{% endblock javascript %}
+
+</html>

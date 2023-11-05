@@ -1,0 +1,59 @@
+{% extends "base/base.html" %}
+{% block title %} Home {% endblock title %}
+
+{% block content %}
+    <div class="container mx-auto p-4">
+        <div class="flex flex-col items-center justify-center h-screen">
+            <!-- Header -->
+            <h1 class="text-5xl font-bold text-colors-white text mb-6 p-4">
+                Let's start a game!
+            </h1>
+            <!-- Room Entry Form -->
+            <form class="flex flex-col items-center" method="POST">
+                {% csrf_token %}
+                <p class="text-colors-red-500 py-3">{{ message }}</p>
+                <input id="room_id_form" name="room_id" type="text" class="w-96 rounded-full px-6 py-4 text-lg text-purple__c bg-white focus:outline-none focus:ring focus:ring-aqua__c mb-4"
+                    placeholder="Enter Room Id" required maxlength="11">
+                <button name='join_form' type="submit" class="w-96 rounded-full bg-pink__c text-colors-white font-semibold text-lg py-4 transition duration-300 hover:bg-light_pink__c">
+                    Enter Room
+                </button>
+            </form>
+            <!-- Line Separator -->
+            <div class="h-px w-16 bg-aqua__c mt-6 mb-4"></div>
+            <!-- Create New Room Button -->
+            <a href="/create-room" class="w-96 rounded-full bg-aqua__c text-colors-white font-semibold text-lg py-4 transition duration-300 hover:bg-light_aqua__c text-center">
+                Create New Room
+            </a>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block javascript %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const roomInput = document.getElementById('room_id_form');
+
+      roomInput.addEventListener('input', function(event) {
+        const inputText = event.target.value;
+        const cleanedInput = inputText.replace(/[^0-9A-Za-z]/g, ''); // Remove non-alphanumeric characters
+        const formattedInput = cleanedInput.replace(/([0-9A-Za-z]{5})([0-9A-Za-z]{0,5})/, '$1-$2'); // Add separator after the first 5 characters
+
+        if (formattedInput !== inputText) {
+          roomInput.value = formattedInput;
+        }
+      });
+
+      roomInput.addEventListener('paste', function(event) {
+        const clipboardData = event.clipboardData.getData('text');
+        const cleanedInput = clipboardData.replace(/[^0-9A-Za-z]/g, ''); // Remove non-alphanumeric characters
+        const formattedInput = cleanedInput.replace(/([0-9A-Za-z]{5})([0-9A-Za-z]{0,5})/, '$1-$2'); // Add separator after the first 5 characters
+
+        if (formattedInput !== clipboardData) {
+          event.preventDefault();
+          roomInput.value = formattedInput;
+        }
+      });
+    });
+    </script>
+
+{% endblock javascript %}
