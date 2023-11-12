@@ -1,0 +1,60 @@
+{% extends "base/game-base.html" %}
+{% block title %} Home {% endblock title %}
+{% load static %}
+
+{% block content %}
+    <div class="container mx-auto p-4 mt-36">
+        <div class="flex flex-col items-center h-screen">
+            <h1 class="text-5xl font-bold text-colors-white p-4 text-center">
+                Who could have said that?
+            </h1>
+            <div class="mb-3 italic rounded-xl py-2 px-5 items-center text-colors-white text-2xl flex flex-col gap-y-4">
+                <p class="font-bold">Q: {{ answers.related_answer.related_question.content  }}</p>
+                A: "{{ answers.related_answer.content }}"
+            </div>
+            <form id="answer_assign_form" class="flex flex-col items-center" method="post">
+                {% csrf_token %}
+                <p class="text-colors-red-500 py-3">{{ message }}</p>
+            <ul class="grid w-full gap-6 md:grid-cols-2 mb-10">
+                 {% for p in players %}
+                <li>
+                    <input type="radio" id="choose-{{ p.player_code }}" name="choice" value="{{ p.player_code }}" class="hidden peer" required>
+                    <label for="choose-{{ p.player_code }}" class="inline-flex items-center justify-between w-full p-5 text-colors-white border border-colors-white rounded-lg cursor-pointer dark:border-gray-700 peer-checked:border-pink__c peer-checked:text-pink__c hover:text-pink__c hover:border-pink__c">
+                        <div class="block">
+                            <div class="w-full text-lg font-semibold">{{ p.nickname }}</div>
+                        </div>
+                    </label>
+                </li>
+                {% endfor %}
+                </ul>
+                <button name="answer_assign_form"
+                        type="submit"
+                        class="w-96 rounded-full bg-pink__c text-colors-white font-semibold text-lg py-4 transition duration-300  disabled:opacity-75 enabled:hover:bg-light_pink__c">
+                    Done
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        //get all the radio buttons
+        const radios = document.querySelectorAll('input[type=radio]');
+        //get only the checked radio button
+        let checked = document.querySelectorAll('input[type=radio]:checked');
+        //get the submit button
+        const btn = document.querySelector('[type=submit]');
+        //disable the button on page load by checking the length
+        if(!checked.length){
+          btn.setAttribute("disabled", "disabled");
+        }
+        radios.forEach(function(el){
+          el.addEventListener('click', function(){
+            checked = document.querySelectorAll('input[type=radio]:checked');
+            if(checked.length){
+              btn.removeAttribute("disabled");
+            }
+          });
+        });
+    </script>
+{% endblock content %}

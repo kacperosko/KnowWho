@@ -19,10 +19,19 @@
 </div>
 </body>
 
+{% block javascript %}
+    <script>
+        const nickname = '{{request.session.nickname}}';
+        let player_code = '{{request.session.player_code}}';
+        let player_id = '{{request.session.player_id}}';
+        const csrf_token = '{% csrf_token %}';
+
+        console.log('nickname -> ' + nickname);
+        console.log('player_code -> ' + player_code);
+    </script>
+{% endblock javascript %}
 <script src="{% static '/js/gameWebSocket.js' %}"></script>
 
-{% block javascript %}
-{% endblock javascript %}
 
 
 </html>

@@ -1,0 +1,73 @@
+{% extends "base/game-base.html" %}
+{% block title %} Home {% endblock title %}
+{% load static %}
+
+{% block content %}
+    <div class="container mx-auto p-4 mt-36">
+        <div class="flex flex-col items-center h-screen">
+            <h1 class="text-5xl font-bold text-colors-white p-4 text-center">
+                Wait for others Players
+            </h1>
+            {% if request.session.isHost %}
+                <div class="p-7">
+                    <button onclick="shufflePlayers('start_game')" class="bg-light_pink__c rounded-xl text-2xl text-colors-white font-bold px-6 py-3">
+                        Next Round
+                    </button>
+                </div>
+            {% endif %}
+             <div class="text-colors-white text-center">
+                <div>
+                    <div class="mb-3 bg-light_aqua__c rounded-xl py-2 px-5 flex items-center">
+                        <img src="{% static 'icons/user_profile.png' %}" class="w-8 mr-3" alt="user profile">
+                        <p>{{ request.session.nickname }} (You)</p>
+                    </div>
+                    <div id="">
+                    {% if players %}
+                        {% for p in players %}
+                            <div id="waitroom_status_{{ p.player_code }}" class="group {% if p.answered %}answered{% endif %} block group-[.answered]:hidden">
+                                <div class="mb-3 bg-light_aqua__c rounded-xl py-2 px-5 flex justify-between items-center opacity-75 group-[.answered]:opacity-100">
+                                    <div class="flex items-center">
+                                        <img src="{% static 'icons/user_profile.png' %}" class="w-8 mr-3" alt="user profile">
+                                        <p>{{ p.nickname }}</p>
+                                    </div>
+                                    <div class="ml-4 text-right rtl:text-left block group-[.answered]:hidden">
+                                        <div class="flex items-center justify-center space-x-2">
+                                            <div class="w-4 h-4 bg-colors-gray-500 rounded-full animate-bounce animation-delay-200"></div>
+                                            <div class="w-4 h-4 bg-colors-gray-500 rounded-full animate-bounce animation-delay-300"></div>
+                                            <div class="w-4 h-4 bg-colors-gray-500 rounded-full animate-bounce animation-delay-400"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% elif answers %}
+                    {% for a in answers %}
+                            <div id="waitroom_status_{{ a.related_player.player_code }}" class="group {% if a.player_choice %}answered{% endif %} block group-[.answered]:hidden">
+                                <div class="mb-3 bg-light_aqua__c rounded-xl py-2 px-5 flex justify-between items-center opacity-75 group-[.answered]:opacity-100">
+                                    <div class="flex items-center">
+                                        <img src="{% static 'icons/user_profile.png' %}" class="w-8 mr-3" alt="user profile">
+                                        <p>{{ a.related_player.nickname }}</p>
+                                    </div>
+                                    <div class="ml-4 text-right rtl:text-left block group-[.answered]:hidden">
+                                        <div class="flex items-center justify-center space-x-2">
+                                            <div class="w-4 h-4 bg-colors-gray-500 rounded-full animate-bounce animation-delay-200"></div>
+                                            <div class="w-4 h-4 bg-colors-gray-500 rounded-full animate-bounce animation-delay-300"></div>
+                                            <div class="w-4 h-4 bg-colors-gray-500 rounded-full animate-bounce animation-delay-400"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <script>
+    </script>
+{% endblock content %}

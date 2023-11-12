@@ -12,6 +12,7 @@
     "autoprefixer": "^10.4.13",
     "jquery": "^3.7.0",
     "node": "^20.5.0",
-    "postcss": "^8.4.20"
+    "postcss": "^8.4.20",
+    "tailwindcss-animation-delay": "^1.2.0"
   }
 }
