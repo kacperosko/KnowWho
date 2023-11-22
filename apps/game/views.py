@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.generic import View
 from .forms import JoinUser, JoinRoom, CreateRoom, AnswerQuestion, AnswerAssignForm
-from .models import Room, Player, Question, Answer, AnswerAssign
+from .models import Room, Player, Question, Answer, AnswerAssign, RoomRound
 from django.http.response import JsonResponse
 from django.db.models import Q
 import random
@@ -21,6 +21,8 @@ def createRoom(request):
                     if not key.startswith("_"):  # skip keys set by the django system
                         del request.session[key]
 
+                generate_question_rounds(room)
+
                 request.session['room_id'] = room.room_code
                 request.session['nickname'] = form.cleaned_data['nickname']
                 request.session['isHost'] = True
@@ -29,6 +31,34 @@ def createRoom(request):
             else:
                 context['message'] = form.errors
     return render(request, "game/game-create-room.html", context)
+
+
+def generate_question_rounds(room):
+    reached_max_round = False
+    current_room_round = RoomRound.objects.filter(room=room).latest('round')
+    if current_room_round:
+        iterate_round = current_room_round.round + 1
+    else:
+        iterate_round = 1
+
+    questions = Question.objects.values_list('id', flat=True).all()
+    round_rooms_to_create = []
+    used_questions = []
+    if questions.count() < room.max_rounds:
+        room.max_rounds = questions.count()
+        room.save()
+
+    while not reached_max_round:
+        reached_max_round = iterate_round == room.max_rounds
+
+        question_id = questions.exclude(id__in=used_questions).order_by('?').first()
+        room_round_question = RoomRound.objects.filter(room=room, question_id=question_id)
+        if not room_round_question.exists():
+            round_rooms_to_create.append(RoomRound(question_id=question_id, room=room, round=iterate_round))
+            used_questions.append(question_id)
+            iterate_round += 1
+
+    RoomRound.objects.bulk_create(round_rooms_to_create)
 
 
 def joinRoom(request):
@@ -57,7 +87,8 @@ def wait_room(request):
             # players = Player.objects.filter(room__room_code=request.session.get('room_id'), player_code=)
             for p in players:
                 p.answered = Answer.objects.filter(related_player=p,
-                                                   related_question_id=request.session.get('current_question_id')).exists()
+                                                   related_question_id=request.session.get(
+                                                       'current_question_id')).exists()
 
             context['players'] = players
             # session_player_code = request.session.get('player_code')
@@ -68,7 +99,9 @@ def wait_room(request):
     elif status == "after":
         if request.session['room_id'] == room_id:
             room = Room.objects.get(room_code=request.session['room_id'])
-            answers = AnswerAssign.objects.filter(Q(related_player__room=room) & Q(related_answer__round=room.current_round) & ~Q(related_player__player_code=request.session['player_code']))
+            answers = AnswerAssign.objects.filter(
+                Q(related_player__room=room) & Q(related_answer__round=room.current_round) & ~Q(
+                    related_player__player_code=request.session['player_code']))
             print(answers)
             context['answers'] = answers
             return render(request, "game/game-waitroom.html", context)
@@ -119,6 +152,47 @@ class QuestionService(View):
         return render(request, "game/game-question.html", context)
 
 
+def get_results(request):
+    room_id = request.GET.get('room_code')
+    context = {}
+    print('show results')
+    if request.session['room_id'] == room_id:
+        room = Room.objects.get(room_code=request.session['room_id'])
+        answers = list(Answer.objects.filter(related_player__room=room, round=room.current_round))
+        answers_assign = AnswerAssign.objects.filter(related_player__room=room,
+                                                     related_answer__round=room.current_round).order_by(
+            'related_player__nickname')
+
+        for a in answers:
+            a.answer_assign = list(answers_assign.filter(related_answer_id=a.id).order_by('related_player__nickname'))
+
+        context['question'] = request.session['current_question']
+        print(answers)
+        context['answers'] = answers
+        return render(request, "game/game-results.html", context)
+
+
+def get_finish(request):
+    context = {}
+    players = Player.objects.filter(room__room_code=request.session['room_id'])
+    answer_assign = AnswerAssign.objects.filter(related_player__in=players)
+
+    for p in players:
+        if p.player_code == request.session['player_code']:
+            p.nickname += ' (You)'
+        temp_assign = answer_assign.filter(related_player_id=p.id)
+        for a in temp_assign:
+            if a.isPoint:
+                p.score += 1
+
+    players = list(players)
+    players.sort(key=lambda x: x.score, reverse=True)
+    print(players)
+
+    context['players'] = players
+    return render(request, "game/game-finish.html", context)
+
+
 class KnowWho(View):
     @staticmethod
     def post(request, *args, **kwargs):
@@ -159,6 +233,9 @@ class KnowWho(View):
         context = {}
         try:
             room_code = request.GET.get('room_code')
+            mode = request.GET.get('mode')
+            if mode == 'multiple':
+                return render(request, "game/game-knowho-multiple.html", context)
             room = Room.objects.get(room_code=room_code)
             answers = AnswerAssign.objects.filter(related_answer__round=room.current_round, related_player__room=room)
             player_answers = answers.filter(related_player__player_code=request.session['player_code'])
@@ -212,14 +289,17 @@ def get_question(request):
     success = False
     context = {}
     try:
-
         room = Room.objects.get(room_code=request.GET.get('room_code'))
         if request.GET.get('action') == 'start_game':
             room.isStarted = True
         room.current_round += 1
-        room.save()
 
-        question = Question.objects.order_by('?').first()
+        if room.current_round > room.max_rounds:
+            context['status'] = 'finish'
+            return JsonResponse(context)
+
+        room.save()
+        question = RoomRound.objects.get(room=room, round=room.current_round).question
         context['question'] = question.content
         context['question_id'] = question.id
         print(question.content)

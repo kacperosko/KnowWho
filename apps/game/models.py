@@ -8,6 +8,7 @@ class Room(models.Model):
     room_code = models.CharField(max_length=11)
     isStarted = models.BooleanField(default=False)
     current_round = models.IntegerField(default=0)
+    max_rounds = models.IntegerField(default=5)
 
     def generate_unique_room_code(self):
         while True:
@@ -21,11 +22,23 @@ class Room(models.Model):
         super().save(*args, **kwargs)
 
 
+class Question(models.Model):
+    content = models.CharField(max_length=255, blank=False, null=True)
+
+
+class RoomRound(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, blank=False, null=False, related_name='RoomRound_room')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=True, null=True,
+                                 related_name='RoomRound_question')
+    round = models.IntegerField(blank=False, default=0)
+
+
 class Player(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, blank=False, null=False, related_name='player_room')
     nickname = models.CharField(max_length=255, blank=False, null=False)
     player_code = models.CharField(max_length=270, blank=False, null=True, unique=True)
 
+    score = 0
     answered = False
 
     def generate_unique_player_code(self):
@@ -36,10 +49,6 @@ class Player(models.Model):
         super().save(*args, **kwargs)
 
 
-class Question(models.Model):
-    content = models.CharField(max_length=255, blank=False, null=True)
-
-
 class Answer(models.Model):
     related_question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=True, null=True,
                                          related_name='answer_question_relationship')
@@ -47,6 +56,8 @@ class Answer(models.Model):
                                        related_name='answer_player_relationship')
     content = models.CharField(max_length=255, blank=True, null=True)
     round = models.IntegerField(blank=False, default=0)
+
+    answer_assign = []
 
 
 class AnswerAssign(models.Model):

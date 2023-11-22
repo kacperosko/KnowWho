@@ -10,6 +10,8 @@ urlpatterns = [
     path("game/question", game_views.QuestionService.as_view(), name="game-home"),
     path("game/waitroom", game_views.wait_room, name="game-wait_room"),
     path("game/know_who", game_views.KnowWho.as_view(), name="game-know_who"),
+    path("game/results", game_views.get_results, name="game-get_results"),
+    path("game/finish", game_views.get_finish, name="game-get_finish"),
 
     path("update_session_variable", game_views.update_session_variable, name="game-update_session_variable"),
     path("clear_player_session", game_views.clear_player_session, name="game-clear_player_session"),

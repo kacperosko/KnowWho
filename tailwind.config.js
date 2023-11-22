@@ -17,7 +17,11 @@ module.exports = {
       'light_aqua__c': '#82cbf9',
       colors,
     },
-    extend: {},
+    extend: {
+       zIndex: {
+        '60': '60',
+      }
+    },
   },
   plugins: [
     require("tailwindcss-animation-delay"),

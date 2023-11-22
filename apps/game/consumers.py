@@ -59,6 +59,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 content["type"] = "send_waitroom_update"
             if content["action"] == "shuffle_players":
                 content["type"] = "send_shuffle_players_update"
+            if content["action"] == "result":
+                content["type"] = "send_results"
+            if content["action"] == "finish":
+                content["type"] = "send_finish"
         except Exception as e:
             print("error", e)
 
@@ -86,6 +90,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(event)
 
     async def send_shuffle_players_update(self, event):
+        await self.send_json(event)
+
+    async def send_results(self, event):
+        await self.send_json(event)
+
+    async def send_finish(self, event):
         await self.send_json(event)
 
     async def send_waitroom_update(self, event):

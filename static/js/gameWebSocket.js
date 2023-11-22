@@ -4,8 +4,11 @@ let chatSocket = null;
 const ACTIONS = {
     ANSWER:'answer',
     JOIN:'join',
+    CLOSE:'close',
     QUESTION:'question',
     SHUFFLE_PLAYERS:'shuffle_players',
+    RESULT:'result',
+    FINISH:'finish',
 };
 
 
@@ -15,21 +18,31 @@ document.addEventListener("DOMContentLoaded", () => {
     roomCode =  urlParams.get('room_code')
 
     chatSocket = new WebSocket(`ws://${window.location.host}/ws/chat/${roomCode}/`);
+    console.log('websocket');
+    console.log(chatSocket);
+    console.log(JSON.stringify(chatSocket));
 
     chatSocket.addEventListener("open", (event) => {
       console.log('The connection was set up successfully to room ' + roomCode + ' for player ' + player_code);
-      const message = '';
+      // document.cookie = 'chatsocket=' + chatSocket;
       const action = ACTIONS.JOIN;
-      console.log(JSON.stringify({nickname, message, action, player_id, player_code}));
-      chatSocket.send(JSON.stringify({nickname, message, action, player_id, player_code}));
+      // console.log(JSON.stringify({nickname, action, player_id, player_code}));
+      chatSocket.send(JSON.stringify({nickname, action, player_id, player_code}));
+      // let result = document.cookie.match(new RegExp('chatsocket' + '=([^;]+)'));
+      // console.log(result)
+      // result && (result = JSON.parse(result[1]));
     });
 
     chatSocket.addEventListener("close", (event) => {
       console.log("Something unexpected happened!");
-      const message = '';
-      const action = 'close';
-      // clearPlayerSession();
-      chatSocket.send(JSON.stringify({nickname, message, action}));
+      const action = ACTIONS.CLOSE;
+      chatSocket.send(JSON.stringify({nickname, action}));
+      // try {
+      //     chatSocket = new WebSocket(`ws://${window.location.host}/ws/chat/${roomCode}/`);
+      // } catch (e) {
+      //     console.log(e);
+      // }
+
     });
 
 
@@ -49,13 +62,10 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
         if ((data.action === 'join' || data.action === 'close') && currentPlayersList !== data.players){
-            console.log('generatePlayersList');
-            console.log('currentPlayersList ->');
-            console.log(currentPlayersList);
-            currentPlayersList = data.players
-            console.log('currentPlayersList after data->');
-            console.log(currentPlayersList);
-            generatePlayersList(currentPlayersList);
+
+            if(window.location.href.indexOf("lobby") !== -1) {
+                generatePlayersList(currentPlayersList);
+            }
         }
         if (data.action === 'question'){
             console.log("question action");
@@ -73,6 +83,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.action === ACTIONS.SHUFFLE_PLAYERS){
             console.log('SHUFFLE_PLAYERS');
             window.location.href = `/game/know_who?room_code=${roomCode}`;
+        }
+        if (data.action === ACTIONS.RESULT){
+            console.log('RESULT');
+            window.location.href = `/game/results?room_code=${roomCode}`;
+        }
+        if (data.action === ACTIONS.
+            FINISH){
+            console.log('FININSH');
+            window.location.href = `/game/finish?room_code=${roomCode}`;
         }
     };
 });
@@ -126,9 +145,13 @@ function getQuestion(action) {
         },
         success: function (d) {
             console.log(d);
-            console.log(d.question);
-            const action = 'question'
-            chatSocket.send(JSON.stringify({'question': d.question, action, 'question_id': d.question_id}));
+            if (d.status === ACTIONS.FINISH){
+                chatSocket.send(JSON.stringify({'action': ACTIONS.FINISH}));
+            }else {
+                console.log(d.question);
+                const action = 'question';
+                chatSocket.send(JSON.stringify({'question': d.question, action, 'question_id': d.question_id}));
+            }
         },
     });
 }
@@ -212,3 +235,7 @@ $(function() {
       });
     });
   });
+
+function showResults(){
+    chatSocket.send(JSON.stringify({'action':ACTIONS.RESULT}));
+}

@@ -9,11 +9,20 @@
                 Wait for others Players
             </h1>
             {% if request.session.isHost %}
-                <div class="p-7">
-                    <button onclick="shufflePlayers('start_game')" class="bg-light_pink__c rounded-xl text-2xl text-colors-white font-bold px-6 py-3">
-                        Next Round
-                    </button>
-                </div>
+                {% if request.GET.status == 'before' %}
+                    <div class="p-7">
+                        <button onclick="shufflePlayers('start_game')" class="bg-light_pink__c rounded-xl text-2xl text-colors-white font-bold px-6 py-3">
+                            Next Round
+                        </button>
+                    </div>
+                {% endif %}
+                {% if request.GET.status == 'after' %}
+                    <div class="p-7">
+                        <button onclick="showResults()" class="bg-light_pink__c rounded-xl text-2xl text-colors-white font-bold px-6 py-3">
+                            Show Results
+                        </button>
+                    </div>
+                {% endif %}
             {% endif %}
              <div class="text-colors-white text-center">
                 <div>

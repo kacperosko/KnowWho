@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Room, Player, Question, Answer, AnswerAssign
+from .models import Room, Player, Question, Answer, AnswerAssign, RoomRound
 
 
 @admin.register(Room)
@@ -22,9 +22,18 @@ class QuestionAdmin(admin.ModelAdmin):
 
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
-    list_display = ('related_question', 'related_player', 'content', 'round')
+    list_display = ('id', 'related_question', 'related_player', 'content', 'round')
     search_fields = ('content',)
     list_filter = ('round', 'related_question', 'related_player')
+
+
+@admin.register(RoomRound)
+class RoomRound(admin.ModelAdmin):
+    list_display = ('room', 'round', 'get_question')
+
+    @admin.display(description="Question")
+    def get_question(self, obj):
+        return (obj.question.content)
 
 
 @admin.register(AnswerAssign)
