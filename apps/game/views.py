@@ -6,6 +6,7 @@ from django.http.response import JsonResponse
 from django.db.models import Q
 import random
 import secrets
+import json
 
 
 def createRoom(request):
@@ -35,9 +36,9 @@ def createRoom(request):
 
 def generate_question_rounds(room):
     reached_max_round = False
-    current_room_round = RoomRound.objects.filter(room=room).latest('round')
-    if current_room_round:
-        iterate_round = current_room_round.round + 1
+    current_room_round = RoomRound.objects.filter(room=room)
+    if current_room_round.exists():
+        iterate_round = current_room_round.latest('round').round + 1
     else:
         iterate_round = 1
 
@@ -91,19 +92,23 @@ def wait_room(request):
                                                        'current_question_id')).exists()
 
             context['players'] = players
-            # session_player_code = request.session.get('player_code')
-            # if session_player_code != '' and session_player_code is not None and session_player_code != 'null':
-            #     if session_player_code[-11:] != request.session.get('room_id'):
-            #         request.session['player_code'] = ''
             return render(request, "game/game-waitroom.html", context)
     elif status == "after":
         if request.session['room_id'] == room_id:
             room = Room.objects.get(room_code=request.session['room_id'])
+            answers_to_display = []
+            players_to_display = []
             answers = AnswerAssign.objects.filter(
                 Q(related_player__room=room) & Q(related_answer__round=room.current_round) & ~Q(
                     related_player__player_code=request.session['player_code']))
-            print(answers)
-            context['answers'] = answers
+
+            for a in answers:
+                if a.related_player.id not in players_to_display:
+                    answers_to_display.append(a)
+                    players_to_display.append(a.related_player.id)
+
+            print(answers_to_display)
+            context['answers'] = answers_to_display
             return render(request, "game/game-waitroom.html", context)
     return redirect("/")
 
@@ -200,13 +205,37 @@ class KnowWho(View):
         print('KnowWho POST')
         if request.method == 'POST':
             print("KnowWho FORM POST")
-            # if 'answer_question_form' in request.POST:
-            print("answer_assign_form")
+            room_code = request.session['room_id']
+            room = Room.objects.get(room_code=room_code)
+
+            if request.POST.get("mode", "") == "multiple":
+                answers = request.POST.get("answers", "")
+                print('answers')
+                print(answers)
+                if answers == "":
+                    return JsonResponse({'success': False, 'errors': "empty answers"})
+                answers = json.loads(answers)
+                answer_assign_to_create = []
+                players_answers = Answer.objects.filter(related_player__room=room, round=room.current_round)
+                players = Player.objects.filter(room=room)
+                answer_assignee = AnswerAssign.objects.filter(related_player__player_code=request.session['player_code'])
+
+                for a in answers:
+                    temp_aa = answer_assignee.get(
+                        related_answer=players_answers.get(answer_code=a['answer_code']))
+                    temp_aa.player_choice = players.get(player_code=a['player_code'])
+                    if temp_aa.player_choice.player_code == temp_aa.related_answer.related_player.player_code:
+                        temp_aa.isPoint = True
+                    answer_assign_to_create.append(temp_aa)
+
+                AnswerAssign.objects.bulk_update(answer_assign_to_create, ['isPoint', 'player_choice'])
+                return JsonResponse({'success': True})
+
             form = AnswerAssignForm(request.POST)
+            print("answer_assign_form")
             if form.is_valid():
                 player_choice_player_code = form.cleaned_data['choice']
-                room_code = request.session['room_id']
-                room = Room.objects.get(room_code=room_code)
+
                 answers = AnswerAssign.objects.filter(related_answer__round=room.current_round,
                                                       related_player__player_code=request.session[
                                                           'player_code']).first()
@@ -233,31 +262,32 @@ class KnowWho(View):
         context = {}
         try:
             room_code = request.GET.get('room_code')
-            mode = request.GET.get('mode')
-            if mode == 'multiple':
-                return render(request, "game/game-knowho-multiple.html", context)
             room = Room.objects.get(room_code=room_code)
+            room_round = RoomRound.objects.get(room=room, round=room.current_round)
+
             answers = AnswerAssign.objects.filter(related_answer__round=room.current_round, related_player__room=room)
             player_answers = answers.filter(related_player__player_code=request.session['player_code'])
             # player_answers = AnswerAssign.objects.filter(related_player__player_code=request.session['player_code'], related_answer__round=room.current_round)
             players_to_choose = []
             for anaswer_player in answers.exclude(related_player__player_code=request.session['player_code']):
-                players_to_choose.append(anaswer_player.related_player)
-            # list(
-            #     player_answers.exclude(related_player__player_code=player_to_exclude_code).values_list('related_player',
-            #                                                                                            flat=True))
+                if anaswer_player.related_player not in players_to_choose:
+                    players_to_choose.append(anaswer_player.related_player)
 
             context['players'] = players_to_choose
             print('player_answers', player_answers)
             print('players_to_choose', players_to_choose)
             if player_answers.exists():
                 player_answers = list(player_answers)
-                if len(player_answers):
+                if len(player_answers) == 1:
                     context['answers'] = player_answers[0]
                 else:
-                    context['answers'] = player_answers
+                    context['answers'] = list(player_answers)
+                    print(context['answers'])
         except Exception as e:
             print('error', e)
+
+        if room_round.mode == 'multiple':
+            return render(request, "game/game-knowho-multiple.html", context)
 
         return render(request, "game/game-knowho-single.html", context)
 
@@ -358,25 +388,33 @@ class gameHomePage(View):
 def shuffle_players(request):
     room_code = request.GET.get('room_code')
     room = Room.objects.get(room_code=room_code)
+    room_round = RoomRound.objects.get(room=room, round=room.current_round)
     players_answer = Answer.objects.filter(related_player__room__room_code=room_code, round=room.current_round)
     players_to_choose = list(players_answer.values_list('related_player', flat=True))
     print('players_to_choose', players_to_choose)
     random.shuffle(players_to_choose)
-    secure_random = secrets.SystemRandom()
-    num_to_select = 1
-
     selection = []
 
-    for p_answer in players_answer:
-        finished = False
-        while not finished:
-            list_of_random_players = secure_random.sample(players_to_choose, num_to_select)
-            random_player = list_of_random_players[0]
-            if random_player != p_answer.related_player.id:
-                selection.append(AnswerAssign(related_player=p_answer.related_player,
-                                              related_answer=players_answer.get(related_player=random_player)))
-                players_to_choose.remove(random_player)
-                finished = True
+    if room_round.mode == 'multiple':
+        for p_answer in players_answer:
+            for player in players_to_choose:
+                if player != p_answer.related_player.id:
+                    print(f"assigne {player} with {p_answer.related_player.id}")
+                    selection.append(AnswerAssign(related_player=p_answer.related_player,
+                                                  related_answer=players_answer.get(related_player=player)))
+    else:
+        secure_random = secrets.SystemRandom()
+        num_to_select = 1
+        for p_answer in players_answer:
+            finished = False
+            while not finished:
+                list_of_random_players = secure_random.sample(players_to_choose, num_to_select)
+                random_player = list_of_random_players[0]
+                if random_player != p_answer.related_player.id:
+                    selection.append(AnswerAssign(related_player=p_answer.related_player,
+                                                  related_answer=players_answer.get(related_player=random_player)))
+                    players_to_choose.remove(random_player)
+                    finished = True
 
     AnswerAssign.objects.bulk_create(selection)
     return JsonResponse({'message': 'Players shuffled successfully', 'success': True}, status=200)

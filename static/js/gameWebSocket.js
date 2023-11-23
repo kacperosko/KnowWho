@@ -62,8 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
         if ((data.action === 'join' || data.action === 'close') && currentPlayersList !== data.players){
-
             if(window.location.href.indexOf("lobby") !== -1) {
+                currentPlayersList = data.players;
                 generatePlayersList(currentPlayersList);
             }
         }

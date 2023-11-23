@@ -35,40 +35,23 @@
             <div class="absolute w-full h-full left-0 top-0 droppable z-40"></div>
 {#            <h1 class="text-colors-white text-2xl">Match answers to players</h1>#}
             <section class="flex flex-row gap-5 flex-wrap items-center justify-center">
-                <div class="flex flex-col text-center">
-                    <span class="text-colors-white text-xl font-bold mb-2 select-none">Codepen</span>
-                    <span style="min-height: 4rem; min-width: 4rem"
-                          class="droppable min-h-fit min-w-fit z-60 p-2 rounded-xl border-dashed border-2 border-colors-white bg-purple__c transition-all duration-100"
-                          drop_space="answer" player-code=""></span>
-                </div>
-                <div class="flex flex-col text-center">
-                  <span class="text-colors-white text-xl font-bold mb-2 select-none">Codepen</span><span style="min-height: 4rem; min-width: 4rem"  class="droppable min-h-fit min-w-fit z-60 p-2 rounded-xl border-dashed border-2 border-colors-white bg-purple__c transition-all duration-100" data-brand="codepen" drop_space="answer" player-code=""></span>
-                </div>
-                <div class="flex flex-col text-center">
-                  <span class="text-colors-white text-xl font-bold mb-2 select-none">Codepen</span><span style="min-height: 4rem; min-width: 4rem"  class="droppable min-h-fit min-w-fit z-60 p-2 rounded-xl border-dashed border-2 border-colors-white bg-purple__c transition-all duration-100" data-brand="codepen" drop_space="answer" player-code=""></span>
-                </div>
-                <div class="flex flex-col text-center">
-                  <span class="text-colors-white text-xl font-bold mb-2 select-none">Codepen</span><span style="min-height: 4rem; min-width: 4rem"  class="droppable min-h-fit min-w-fit z-60 p-2 rounded-xl border-dashed border-2 border-colors-white bg-purple__c transition-all duration-100" data-brand="codepen" drop_space="answer" player-code=""></span>
-                </div>
-                <div class="flex flex-col text-center">
-                  <span class="text-colors-white text-xl font-bold mb-2 select-none">Codepen</span><span style="min-height: 4rem; min-width: 4rem"  class="droppable min-h-fit min-w-fit z-60 p-2 rounded-xl border-dashed border-2 border-colors-white bg-purple__c transition-all duration-100" data-brand="codepen" drop_space="answer" player-code=""></span>
-                </div>
-                <div class="flex flex-col text-center">
-                  <span class="text-colors-white text-xl font-bold mb-2 select-none">Codepen</span><span style="min-height: 4rem; min-width: 4rem"  class="droppable min-h-fit min-w-fit z-60 p-2 rounded-xl border-dashed border-2 border-colors-white bg-purple__c transition-all duration-100" data-brand="codepen" drop_space="answer" player-code=""></span>
-                </div>
-                <div class="flex flex-col text-center">
-                  <span class="text-colors-white text-xl font-bold mb-2 select-none">Codepen</span><span style="min-height: 4rem; min-width: 4rem"  class="droppable min-h-fit min-w-fit z-60 p-2 rounded-xl border-dashed border-2 border-colors-white bg-purple__c transition-all duration-100" data-brand="codepen" drop_space="answer" player-code=""></span>
-                </div>
+                {% for p in players %}
+                    <div class="flex flex-col text-center">
+                        <span class="text-colors-white text-xl font-bold mb-2 select-none">{{ p.nickname }}</span>
+                        <span style="min-height: 4rem; min-width: 4rem"
+                              class="droppable min-h-fit min-w-fit z-60 p-2 rounded-xl border-dashed border-2 border-colors-white bg-purple__c transition-all duration-100"
+                              drop_space="answer" player-code="{{ p.player_code }}"></span>
+                    </div>
+                {% endfor %}
+
             </section>
 
             <section class="draggable-items flex gap-4 flex-wrap w-2/3 mt-10 place-content-center " id="draggable_elements">
-                <p class="fab fa-codepen draggable bg-pink__c rounded-xl px-3 text-colors-white z-50 flex-initial select-none" draggable="true" id="codepen1">Kacpe asdasd asd asd r</p>
-                <p class="fab fa-codepen draggable bg-pink__c rounded-xl px-3 text-colors-white z-50 flex-initial select-none" draggable="true" id="codepen2">Kacper</p>
-                <p class="fab fa-codepen draggable bg-pink__c rounded-xl px-3 text-colors-white z-50 flex-initial select-none" draggable="true" id="codepen3">Kacpe asdr</p>
-                <p class="fab fa-codepen draggable bg-pink__c rounded-xl px-3 text-colors-white z-50 flex-initial select-none" draggable="true" id="codepen4">Kacasd asd asd asdper</p>
-                <p class="fab fa-codepen draggable bg-pink__c rounded-xl px-3 text-colors-white z-50 flex-initial select-none" draggable="true" id="codepen5">Kacper</p>
-                <p class="fab fa-codepen draggable bg-pink__c rounded-xl px-3 text-colors-white z-50 flex-initial select-none" draggable="true" id="codepen6">Kacper</p>
-                <p class="fab fa-codepen draggable bg-pink__c rounded-xl px-3 text-colors-white z-50 flex-initial select-none" draggable="true" id="codepen8">Kacper</p>
+                {% for a in answers %}
+                    <p class="fab fa-codepen draggable bg-pink__c rounded-xl px-3 text-colors-white z-50 flex-initial select-none" draggable="true" id="answer_{{ a.related_answer.answer_code }}" answer-code="{{ a.related_answer.answer_code }}">
+                        {{ a.related_answer.content}}
+                    </p>
+                {% endfor %}
             </section>
 
             <p id="error_message" class="text-colors-red-500 text-lg mt-8"></p>
@@ -82,26 +65,4 @@
     </div>
 
     <script src="{% static '/js/dragNdrop.js' %}"></script>
-    <script>
-    function saveAnswers(){
-        let draggable_elements = document.querySelectorAll(".draggable");
-        console.log(draggable_elements);
-        let success = true;
-
-        draggable_elements.forEach(elem => {
-            if (elem.parentNode.getAttribute('player-code') === null){
-                success=false;
-            }
-        });
-
-        if (success){
-            console.log("success")
-        }else {
-            $('#error_message').text("You must assign all answers to players before save");
-        }
-
-
-    }
-
-    </script>
 {% endblock content %}

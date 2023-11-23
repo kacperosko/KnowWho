@@ -580,10 +580,6 @@ video {
   position: absolute;
 }
 
-.relative {
-  position: relative;
-}
-
 .left-0 {
   left: 0px;
 }
@@ -662,20 +658,16 @@ video {
   margin-top: 2.5rem;
 }
 
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
 .mt-36 {
   margin-top: 9rem;
 }
 
 .mt-6 {
   margin-top: 1.5rem;
-}
-
-.mt-5 {
-  margin-top: 1.25rem;
-}
-
-.mt-2 {
-  margin-top: 0.5rem;
 }
 
 .mt-8 {
@@ -773,24 +765,12 @@ video {
   max-width: 48rem;
 }
 
-.flex-auto {
-  flex: 1 1 auto;
-}
-
-.flex-1 {
-  flex: 1 1 0%;
-}
-
 .flex-initial {
   flex: 0 1 auto;
 }
 
 .-translate-x-1\/2 {
   --tw-translate-x: -50%;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-
-.transform {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
@@ -907,11 +887,6 @@ video {
   border-color: rgb(255 255 255 / var(--tw-border-opacity));
 }
 
-.border-pink__c {
-  --tw-border-opacity: 1;
-  border-color: rgb(242 92 202 / var(--tw-border-opacity));
-}
-
 .bg-aqua__c {
   --tw-bg-opacity: 1;
   background-color: rgb(5 151 242 / var(--tw-bg-opacity));
@@ -1023,10 +998,6 @@ video {
   text-align: right;
 }
 
-.align-middle {
-  vertical-align: middle;
-}
-
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
@@ -1098,10 +1069,6 @@ video {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
-.outline {
-  outline-style: solid;
-}
-
 .transition {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
@@ -1116,16 +1083,12 @@ video {
   transition-duration: 150ms;
 }
 
-.duration-300 {
-  transition-duration: 300ms;
-}
-
-.duration-200 {
-  transition-duration: 200ms;
-}
-
 .duration-100 {
   transition-duration: 100ms;
+}
+
+.duration-300 {
+  transition-duration: 300ms;
 }
 
 .animation-delay-200 {

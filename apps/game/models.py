@@ -26,10 +26,17 @@ class Question(models.Model):
     content = models.CharField(max_length=255, blank=False, null=True)
 
 
+MODES_CHOICES = (
+    ('single', 'SINGLE'),
+    ('multiple', 'MULTIPLE'),
+)
+
+
 class RoomRound(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, blank=False, null=False, related_name='RoomRound_room')
     question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=True, null=True,
                                  related_name='RoomRound_question')
+    mode = models.CharField(max_length=10, choices=MODES_CHOICES, default='multiple')
     round = models.IntegerField(blank=False, default=0)
 
 
@@ -50,6 +57,7 @@ class Player(models.Model):
 
 
 class Answer(models.Model):
+    answer_code = models.CharField(max_length=11)
     related_question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=True, null=True,
                                          related_name='answer_question_relationship')
     related_player = models.ForeignKey(Player, on_delete=models.CASCADE, blank=True, null=True,
@@ -58,6 +66,17 @@ class Answer(models.Model):
     round = models.IntegerField(blank=False, default=0)
 
     answer_assign = []
+
+    def generate_unique_answer_code(self):
+        while True:
+            answer_code = f'{uuid.uuid4().hex[:5]}-{uuid.uuid4().hex[:5]}'
+            if not Answer.objects.filter(answer_code=answer_code).exists():
+                return answer_code
+
+    def save(self, *args, **kwargs):
+        if not self.answer_code:
+            self.answer_code = self.generate_unique_answer_code()
+        super().save(*args, **kwargs)
 
 
 class AnswerAssign(models.Model):
