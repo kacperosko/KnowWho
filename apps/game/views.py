@@ -163,17 +163,31 @@ def get_results(request):
     print('show results')
     if request.session['room_id'] == room_id:
         room = Room.objects.get(room_code=request.session['room_id'])
-        answers = list(Answer.objects.filter(related_player__room=room, round=room.current_round))
+        answers = Answer.objects.filter(related_player__room=room, round=room.current_round).order_by('related_player__nickname')
+        players = []
+        for a in answers:
+            players.append(a.related_player)
+        # players = [a.related_player for a in answers].sort()
         answers_assign = AnswerAssign.objects.filter(related_player__room=room,
-                                                     related_answer__round=room.current_round).order_by(
-            'related_player__nickname')
+                                                     related_answer__round=room.current_round).order_by('related_player__nickname')
 
         for a in answers:
-            a.answer_assign = list(answers_assign.filter(related_answer_id=a.id).order_by('related_player__nickname'))
-
+            temp_assign = []
+            # a.answer_assign = list(answers_assign.filter(related_answer_id=a.id).order_by('related_player__nickname'))
+            for p in players:
+                player_choice = answers_assign.filter(related_player=p, related_answer=a)
+                if player_choice.exists():
+                    temp_assign.append(player_choice.first())
+                else:
+                    temp_assign.append(None)
+            a.answer_assign = temp_assign
+            print(a.answer_assign)
+        print(a)
         context['question'] = request.session['current_question']
         print(answers)
         context['answers'] = answers
+        print('players', players)
+        context['players'] = list(players)
         return render(request, "game/game-results.html", context)
 
 
