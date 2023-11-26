@@ -3,7 +3,7 @@ from django.views.generic import View
 from .forms import JoinUser, JoinRoom, CreateRoom, AnswerQuestion, AnswerAssignForm
 from .models import Room, Player, Question, Answer, AnswerAssign, RoomRound
 from django.http.response import JsonResponse
-from django.db.models import Q
+from django.db.models import Q, Sum
 import random
 import secrets
 import json
@@ -165,11 +165,11 @@ def get_results(request):
         room = Room.objects.get(room_code=request.session['room_id'])
         answers = Answer.objects.filter(related_player__room=room, round=room.current_round).order_by('related_player__nickname')
         players = []
-        for a in answers:
-            players.append(a.related_player)
-        # players = [a.related_player for a in answers].sort()
         answers_assign = AnswerAssign.objects.filter(related_player__room=room,
                                                      related_answer__round=room.current_round).order_by('related_player__nickname')
+        for a in answers:
+            a.related_player.current_round_score = answers_assign.filter(related_player=a.related_player, isPoint=True).count()
+            players.append(a.related_player)
 
         for a in answers:
             temp_assign = []
@@ -177,16 +177,16 @@ def get_results(request):
             for p in players:
                 player_choice = answers_assign.filter(related_player=p, related_answer=a)
                 if player_choice.exists():
+                    temp_player = player_choice.first()
+                    # temp_player.related_player.current_round_score = answers_assign.filter(related_player=temp_player.related_player, isPoint=True).count()
+                    # print('score -> ', temp_player.related_player.current_round_score)
+
                     temp_assign.append(player_choice.first())
                 else:
                     temp_assign.append(None)
             a.answer_assign = temp_assign
-            print(a.answer_assign)
-        print(a)
         context['question'] = request.session['current_question']
-        print(answers)
         context['answers'] = answers
-        print('players', players)
         context['players'] = list(players)
         return render(request, "game/game-results.html", context)
 

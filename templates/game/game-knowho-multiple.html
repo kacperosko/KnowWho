@@ -29,7 +29,7 @@
         <div class="flex flex-col items-center">
 
             <h1 class="text-5xl font-bold text-colors-white p-4 text-center">
-                {{ question}}
+                {{ question }}
             </h1>
 
             <div class="absolute w-full h-full left-0 top-0 droppable z-40"></div>
@@ -46,6 +46,9 @@
 
             </section>
 
+            <h1 class="text-5xl font-bold text-colors-white p-4 text-center">
+                Drag & Drop answers to correct players above
+            </h1>
             <section class="draggable-items flex gap-4 flex-wrap w-2/3 mt-10 place-content-center " id="draggable_elements">
                 {% for a in answers %}
                     <p class="fab fa-codepen draggable bg-pink__c rounded-xl px-3 text-colors-white z-50 flex-initial select-none" draggable="true" id="answer_{{ a.related_answer.answer_code }}" answer-code="{{ a.related_answer.answer_code }}">

@@ -47,9 +47,10 @@ class Player(models.Model):
 
     score = 0
     answered = False
+    current_round_score = 0
 
     def generate_unique_player_code(self):
-        return self.nickname.upper() + "_" + self.room.room_code
+        return self.nickname.upper().replace(' ', '_') + "_" + self.room.room_code
 
     def save(self, *args, **kwargs):
         self.player_code = self.generate_unique_player_code()
