@@ -5,11 +5,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Know Each Other</title>
+    <title>Know Who</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/logo.ico' %}">
     <link rel="stylesheet" href="{% static '/style/tailwind-output.css' %}" >
     <link href="/static/style/otu">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <style>
+
+    </style>
+    {% block style %}{% endblock style %}
 </head>
 
 <body class="bg-purple__c">
@@ -19,10 +24,19 @@
 </div>
 </body>
 
+{% block javascript %}
+    <script>
+        const nickname = '{{request.session.nickname}}';
+        let player_code = '{{request.session.player_code}}';
+        let player_id = '{{request.session.player_id}}';
+        const csrf_token = '{% csrf_token %}';
+
+        console.log('nickname -> ' + nickname);
+        console.log('player_code -> ' + player_code);
+    </script>
+{% endblock javascript %}
 <script src="{% static '/js/gameWebSocket.js' %}"></script>
 
-{% block javascript %}
-{% endblock javascript %}
 
 
 </html>

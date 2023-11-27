@@ -1,0 +1,91 @@
+{% extends "base/game-base.html" %}
+{% block title %} Home {% endblock title %}
+{% load static %}
+
+{% block content %}
+    <div class="mx-auto p-4">
+        <div class="">
+            <p class="text-colors-white text-xl mx-auto w-fit">Results for question:</p>
+            <h1 class="text-5xl font-bold text-colors-white p-4 text-center mb-5">
+                {{ question }}
+            </h1>
+
+            {% if request.session.isHost %}
+                <div class="p-7 mx-auto w-fit">
+                    <button onclick="getQuestion('next_question')" class="bg-light_pink__c rounded-xl text-2xl text-colors-white font-bold px-6 py-3">
+                        Next Round
+                    </button>
+                </div>
+            {% endif %}
+             <div class="text-colors-white text-center">
+                        <div class="overflow-x-auto w-full px-8 mx-auto text-center">
+                            <table class="text-sm border-separate border-spacing-1 mx-auto">
+                                <thead class="text-xs text-gray-700 uppercase ">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-center bg-colors-transparent rounded-t-2xl">
+
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-center bg-colors-purple-500 rounded-t-2xl">
+                                            Answers
+                                        </th>
+                                        {% for p in players %}
+                                            <th scope="col" class="px-6 py-3 text-center bg-colors-purple-500 rounded-t-2xl">
+                                                <p>{{ p.nickname }}</p>
+                                                <p class="font-normal text-xs">+{{ p.current_round_score }}</p>
+                                            </th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for a in answers %}
+                                        <tr class="">
+{#                                            <th scope="row" class="px-2 py-4 bg-colors-purple-500 font-medium text-gray-900 text-center rounded-l-2xl flex flex-col justify-items-center">#}
+{#                                                <div class="flex self-start items-center mx-auto">#}
+{#                                                    <img src="{% static 'icons/user_profile.png' %}" class="w-7 mr-3" alt="user profile">#}
+{#                                                    <p class="font-bold">{{ a.related_player.nickname }} answered:</p>#}
+{#                                                </div>#}
+{#                                            </th>#}
+                                            <td class="px-2 py-4 bg-colors-purple-500 font-medium text-gray-900 text-center rounded-l-2xl min-w-fit">
+                                                <div class="flex self-start items-center mx-auto min-w-fit flex-wrap">
+{#                                                    <img src="{% static 'icons/user_profile.png' %}" class="w-7 mr-3" alt="user profile">#}
+                                                    <p class="mx-auto"><span class="font-bold">{{ a.related_player.nickname }}</span> answered:</p>
+                                                </div>
+                                            </td>
+                                             <td class="px-6 py-4 bg-colors-purple-700">
+                                                <p class="max-w-sm">{{ a.content }}</p>
+                                            </td>
+                                            {% for pc in a.answer_assign %}
+                                                {% if not pc%}
+                                                    <td class="px-6 py-4  bg-colors-neutral-400 opacity-50 "></td>
+                                                {% else %}
+                                                    <td class="bg-colors-purple-800">
+                                                        {% if pc.isPoint  %}
+                                                            <div class="flex mx-auto p-2">
+                                                                <img src="{% static 'icons/check-green.svg' %}" class="w-5 mr-2 ml-auto" alt="correct icon">
+                                                                <p class="text-colors-green-400 font-bold mr-auto text-left w-fit">{{ pc.player_choice.nickname }}</p>
+                                                            </div>
+                                                        {% else %}
+                                                            <div class="flex mx-auto p-2">
+                                                                <img src="{% static 'icons/cancel-red.svg' %}" class="w-5 mr-2 ml-auto" alt="wrong icon">
+                                                                <p class="text-colors-red-500 mr-auto text-left">{{ pc.player_choice.nickname }}</p>
+                                                            </div>
+                                                        {% endif %}
+                                                    </td>
+                                                {% endif %}
+                                            {% endfor %}
+
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <script>
+    </script>
+{% endblock content %}

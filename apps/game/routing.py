@@ -5,4 +5,5 @@ from apps.game.consumers import ChatConsumer
 # will handle the chat functionality.
 websocket_urlpatterns = [
     path('ws/chat/<str:room_name>/', ChatConsumer.as_asgi()),
+    path('', ChatConsumer.as_asgi()),
 ]

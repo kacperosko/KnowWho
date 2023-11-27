@@ -10,5 +10,12 @@ class JoinUser(forms.Form):
 
 
 class CreateRoom(forms.Form):
-    room_name = forms.CharField(max_length=32)
     nickname = forms.CharField(max_length=100)
+
+
+class AnswerQuestion(forms.Form):
+    answer = forms.CharField(max_length=255, required=True)
+
+
+class AnswerAssignForm(forms.Form):
+    choice = forms.CharField(max_length=255, required=True)
