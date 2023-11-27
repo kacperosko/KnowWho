@@ -293,7 +293,7 @@ class KnowWho(View):
             if player_answers.exists():
                 player_answers = list(player_answers)
                 if len(player_answers) == 1:
-                    context['answers'] = player_answers[0]
+                    context['answers'] = list(player_answers)
                 else:
                     context['answers'] = list(player_answers)
                     print(context['answers'])
