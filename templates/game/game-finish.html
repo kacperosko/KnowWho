@@ -3,9 +3,10 @@
 {% load static %}
 
 {% block content %}
-    <div class="container mx-auto p-4 mt-36">
-        <div class="flex flex-col items-center h-screen">
-            <h1 class="text-5xl font-bold text-colors-white p-4">
+    <canvas class="confetti_canvas"></canvas>
+    <div id="finish_box" class="container mx-auto p-4 mt-10">
+        <div class="flex flex-col items-center">
+            <h1 class="text-5xl font-bold text-colors-white p-4" >
                 Congrats!!!
             </h1>
 
@@ -14,7 +15,7 @@
                 <div>
                     {% for p in players %}
                         <div class="mb-3 bg-light_aqua__c rounded-xl py-2 px-5 flex flex-row items-center">
-                            <img src="{% static 'icons/user_profile.png' %}" class="w-8 mr-3" alt="user profile">
+{#                            <img src="{% static 'icons/user_profile.png' %}" class="w-8 mr-3" alt="user profile">#}
                             <p class="mr-10">{{ p.nickname }}</p>
                             <p class="ml-auto">{{ p.score }}</p>
                         </div>
@@ -35,4 +36,6 @@
             console.log("room code coppied!")
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/js-confetti@0.9.0/dist/js-confetti.browser.js"></script>
+    <script src="{% static '/js/confetti.js' %}"></script>
 {% endblock content %}

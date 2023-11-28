@@ -36,6 +36,8 @@ def createRoom(request):
 
 def generate_question_rounds(room):
     reached_max_round = False
+    isMixed = False
+    mode = 'single'
     current_room_round = RoomRound.objects.filter(room=room)
     if current_room_round.exists():
         iterate_round = current_room_round.latest('round').round + 1
@@ -49,13 +51,19 @@ def generate_question_rounds(room):
         room.max_rounds = questions.count()
         room.save()
 
+    if room.game_mode == 'mixed':
+        isMixed = True
+    if room.game_mode == 'multiple':
+        mode = 'multiple'
     while not reached_max_round:
         reached_max_round = iterate_round == room.max_rounds
 
         question_id = questions.exclude(id__in=used_questions).order_by('?').first()
         room_round_question = RoomRound.objects.filter(room=room, question_id=question_id)
         if not room_round_question.exists():
-            round_rooms_to_create.append(RoomRound(question_id=question_id, room=room, round=iterate_round))
+            if isMixed:
+                mode = 'single' if iterate_round%2==0 else 'multiple'
+            round_rooms_to_create.append(RoomRound(question_id=question_id, room=room, round=iterate_round, mode=mode))
             used_questions.append(question_id)
             iterate_round += 1
 
@@ -278,7 +286,7 @@ class KnowWho(View):
             room_code = request.GET.get('room_code')
             room = Room.objects.get(room_code=room_code)
             room_round = RoomRound.objects.get(room=room, round=room.current_round)
-
+            question_round = RoomRound.objects.get(round=room.current_round, room=room)
             answers = AnswerAssign.objects.filter(related_answer__round=room.current_round, related_player__room=room)
             player_answers = answers.filter(related_player__player_code=request.session['player_code'])
             # player_answers = AnswerAssign.objects.filter(related_player__player_code=request.session['player_code'], related_answer__round=room.current_round)
@@ -292,8 +300,8 @@ class KnowWho(View):
             print('players_to_choose', players_to_choose)
             if player_answers.exists():
                 player_answers = list(player_answers)
-                if len(player_answers) == 1:
-                    context['answers'] = list(player_answers)
+                if question_round.mode == 'single':
+                    context['answers'] = player_answers[0]
                 else:
                     context['answers'] = list(player_answers)
                     print(context['answers'])

@@ -1,14 +1,19 @@
 from django.db import models
 import uuid
 
+GAME_MODES_CHOICES = (
+    ('mixed', 'MIXED'),
+    ('single', 'SINGLE'),
+    ('multiple', 'MULTIPLE'),
+)
 
-# Create your models here.
 
 class Room(models.Model):
     room_code = models.CharField(max_length=11)
     isStarted = models.BooleanField(default=False)
     current_round = models.IntegerField(default=0)
-    max_rounds = models.IntegerField(default=5)
+    max_rounds = models.IntegerField(default=4)
+    game_mode = models.CharField(max_length=10, choices=GAME_MODES_CHOICES, default='mixed')
 
     def generate_unique_room_code(self):
         while True:

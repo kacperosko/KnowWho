@@ -29,7 +29,7 @@ class AnswerAdmin(admin.ModelAdmin):
 
 @admin.register(RoomRound)
 class RoomRound(admin.ModelAdmin):
-    list_display = ('room', 'round', 'get_question')
+    list_display = ('room', 'round', 'get_question', 'mode')
 
     @admin.display(description="Question")
     def get_question(self, obj):
