@@ -116,17 +116,17 @@ function generatePlayersList(playersList) {
             playerDiv.className = "mb-3 bg-light_aqua__c rounded-xl py-2 px-5 flex items-center";
 
             // Create an image element
-            const imgElement = document.createElement("img");
-            imgElement.src = profile_picture_url;
-            imgElement.className = "w-8 mr-3";
-            imgElement.alt = "user profile";
+            // const imgElement = document.createElement("img");
+            // imgElement.src = profile_picture_url;
+            // imgElement.className = "w-8 mr-3";
+            // imgElement.alt = "user profile";
 
             // Create a paragraph element for the player's nickname
             const pElement = document.createElement("p");
             pElement.textContent = player.nickname;
 
             // Append the image and paragraph elements to the player's div
-            playerDiv.appendChild(imgElement);
+            // playerDiv.appendChild(imgElement);
             playerDiv.appendChild(pElement);
 
             // Add the player's div to the parent container
@@ -195,18 +195,28 @@ function updateSessionVariable(session_name, session_value, _callback) {
 $(function () {
     $('#answer_question_form').on('submit', function (event) {
         event.preventDefault();
-        let canvasData = null;
+        let canvasData = 'null';
+        let answer= 'null';
         const canvas = document.getElementById('answer_canvas');
+        const answer_element = document.getElementById('answer_content_question_form');
         if (canvas !== null) {
-            canvasData = document.getElementById('answer_canvas').toDataURL();
+            console.log('canvas -> ' + canvas);
+            canvasData = document.getElementById('answer_canvas').toDataURL("image/png", 0.5);
+        } else if (answer_element !== null){
+            console.log('answer_element = -> ');
+            console.log(answer_element);
+            console.log('answer value = -> ' + answer_element.value);
+            answer = answer_element.value;
         }
+
         $.ajax({
             url: '/game/question',
             type: 'POST',
             data: {
                 csrfmiddlewaretoken: $(csrf_token).val(),
                 form: $(this).serialize(),
-                canvas: canvasData
+                canvas: canvasData,
+                answer: answer
             },
             dataType: 'json',
             success: function (response) {

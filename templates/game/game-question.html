@@ -11,7 +11,7 @@
             <form id="answer_question_form" class="flex flex-col items-center" method="post">
                 {% csrf_token %}
                 <p class="text-colors-red-500 py-3">{{ message }}</p>
-                <textarea name="answer" type="text" class="w-96 rounded-full px-6 py-4 text-lg text-purple__c bg-white focus:outline-none focus:ring focus:ring-aqua__c mb-4"
+                <textarea id="answer_content_question_form" name="answer" type="text" class="w-96 rounded-full px-6 py-4 text-lg text-purple__c bg-white focus:outline-none focus:ring focus:ring-aqua__c mb-4"
                     placeholder="Your Answer" maxlength="255" required></textarea>
                 <button name="answer_question_form"
                         type="submit"

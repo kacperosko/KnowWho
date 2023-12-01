@@ -129,17 +129,19 @@ class QuestionService(View):
         if request.method == 'POST':
             isValid = False
             print("QuestionService FORM POST")
-            # if 'answer_question_form' in request.POST:
             print("answer_question_form")
-            print('$$ CANVAS DATA ', request.POST.get('canvas', None))
-            form = AnswerQuestion(request.POST.get('form', None))
-            if request.POST.get('canvas') is not None:
-                print("$$$ Canvas")
+
+            canvas = request.POST.get('canvas')
+            answer = request.POST.get('answer')
+            print('canvas', canvas)
+            print('answer', answer)
+            if canvas is not None and canvas != 'null':
+                print('canvas', canvas)
                 player_answer = request.POST.get('canvas')
-                print(player_answer)
                 isValid = True
-            elif form.is_valid():
-                player_answer = form.cleaned_data['answer']
+            elif answer is not None and answer != 'null':
+                print('answer', answer)
+                player_answer = request.POST.get('answer')
                 isValid = True
 
             if isValid:
@@ -158,7 +160,7 @@ class QuestionService(View):
                 # return redirect(f"/game/waitroom?room_code={player_room.room_code}")
                 return JsonResponse({'success': True})
             else:
-                return JsonResponse({'success': False, 'errors': form.errors})
+                return JsonResponse({'success': False, 'errors': 'You must provide answer'})
 
     @staticmethod
     def get(request, *args, **kwargs):
@@ -214,10 +216,9 @@ def get_results(request):
         context['question'] = request.session['current_question']
         context['answers'] = answers
         context['players'] = list(players)
-        if room_round.mode == 'draw':
-            return render(request, "game/game-results-draw.html", context)
-        else:
-            return render(request, "game/game-results.html", context)
+        context['mode'] = room_round.mode
+
+        return render(request, "game/game-results.html", context)
 
 
 def get_finish(request):
@@ -306,7 +307,6 @@ class KnowWho(View):
         try:
             room_code = request.GET.get('room_code')
             room = Room.objects.get(room_code=room_code)
-            room_round = RoomRound.objects.get(room=room, round=room.current_round)
             question_round = RoomRound.objects.get(round=room.current_round, room=room)
             answers = AnswerAssign.objects.filter(related_answer__round=room.current_round, related_player__room=room)
             player_answers = answers.filter(related_player__player_code=request.session['player_code'])
@@ -319,6 +319,7 @@ class KnowWho(View):
             context['players'] = players_to_choose
             print('player_answers', player_answers)
             print('players_to_choose', players_to_choose)
+            print('question', question_round.question.content)
             if player_answers.exists():
                 player_answers = list(player_answers)
                 if question_round.mode == 'single':
@@ -326,14 +327,15 @@ class KnowWho(View):
                 else:
                     context['answers'] = list(player_answers)
                     print('answers', context['answers'])
+                    for a in context['answers']:
+                        print('$$ A content ->', a.related_answer.content)
         except Exception as e:
             print('error', e)
 
-        if room_round.mode == 'multiple':
+        context['question'] = question_round.question.content
+        context['mode'] = question_round.mode
+        if question_round.mode == 'multiple' or question_round.mode == 'draw':
             return render(request, "game/game-knowho-multiple.html", context)
-
-        if room_round.mode == 'draw':
-            return render(request, "game/game-knowho-multiple-draw.html", context)
 
         return render(request, "game/game-knowho-single.html", context)
 
