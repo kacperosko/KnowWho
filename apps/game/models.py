@@ -34,6 +34,7 @@ class Question(models.Model):
 MODES_CHOICES = (
     ('single', 'SINGLE'),
     ('multiple', 'MULTIPLE'),
+    ('draw', 'DRAW'),
 )
 
 

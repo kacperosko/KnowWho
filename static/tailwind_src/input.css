@@ -9,4 +9,20 @@
         @apply text-colors-red-500;
         @apply py-3;
     }
+
+    .color-selector {
+        @apply rounded-full;
+        @apply bg-colors-red-600;
+        @apply block;
+        @apply p-4;
+        @apply cursor-pointer;
+    }
+
+    .width-selector {
+        @apply w-16;
+        @apply bg-colors-white;
+        @apply rounded-xl;
+        @apply mx-auto;
+        @apply cursor-pointer;
+    }
 }

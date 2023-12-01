@@ -127,12 +127,22 @@ class QuestionService(View):
         context = {}
         print('QuestionService POST')
         if request.method == 'POST':
+            isValid = False
             print("QuestionService FORM POST")
             # if 'answer_question_form' in request.POST:
             print("answer_question_form")
-            form = AnswerQuestion(request.POST)
-            if form.is_valid():
+            print('$$ CANVAS DATA ', request.POST.get('canvas', None))
+            form = AnswerQuestion(request.POST.get('form', None))
+            if request.POST.get('canvas') is not None:
+                print("$$$ Canvas")
+                player_answer = request.POST.get('canvas')
+                print(player_answer)
+                isValid = True
+            elif form.is_valid():
                 player_answer = form.cleaned_data['answer']
+                isValid = True
+
+            if isValid:
                 player_room = Room.objects.get(room_code=request.session.get('room_id'))
                 print('player_answer -> ', player_answer)
                 print('player_room current_round -> ', player_room.current_round)
@@ -153,6 +163,7 @@ class QuestionService(View):
     @staticmethod
     def get(request, *args, **kwargs):
         context = {}
+        print("$$$ QuestionService GET -> Get Question")
         try:
             player_answer = Answer.objects.filter(related_player__player_code=request.session['player_code'],
                                                   related_question_id=request.session['current_question_id'])
@@ -161,8 +172,14 @@ class QuestionService(View):
         except Exception as e:
             print('error', e)
 
-        context['question'] = request.session.get('current_question')
-        return render(request, "game/game-question.html", context)
+        # context['question'] = request.session.get('current_question')
+        room = Room.objects.get(room_code=request.session['room_id'])
+        room_round = RoomRound.objects.get(room=room, round=room.current_round)
+        context['question'] = room_round.question.content
+        if room_round.mode == "draw":
+            return render(request, "game/game-question-draw.html", context)
+        else:
+            return render(request, "game/game-question.html", context)
 
 
 def get_results(request):
@@ -171,6 +188,7 @@ def get_results(request):
     print('show results')
     if request.session['room_id'] == room_id:
         room = Room.objects.get(room_code=request.session['room_id'])
+        room_round = RoomRound.objects.get(room=room, round=room.current_round)
         answers = Answer.objects.filter(related_player__room=room, round=room.current_round).order_by('related_player__nickname')
         players = []
         answers_assign = AnswerAssign.objects.filter(related_player__room=room,
@@ -196,7 +214,10 @@ def get_results(request):
         context['question'] = request.session['current_question']
         context['answers'] = answers
         context['players'] = list(players)
-        return render(request, "game/game-results.html", context)
+        if room_round.mode == 'draw':
+            return render(request, "game/game-results-draw.html", context)
+        else:
+            return render(request, "game/game-results.html", context)
 
 
 def get_finish(request):
@@ -304,12 +325,15 @@ class KnowWho(View):
                     context['answers'] = player_answers[0]
                 else:
                     context['answers'] = list(player_answers)
-                    print(context['answers'])
+                    print('answers', context['answers'])
         except Exception as e:
             print('error', e)
 
         if room_round.mode == 'multiple':
             return render(request, "game/game-knowho-multiple.html", context)
+
+        if room_round.mode == 'draw':
+            return render(request, "game/game-knowho-multiple-draw.html", context)
 
         return render(request, "game/game-knowho-single.html", context)
 
@@ -417,7 +441,7 @@ def shuffle_players(request):
     random.shuffle(players_to_choose)
     selection = []
 
-    if room_round.mode == 'multiple':
+    if room_round.mode == 'multiple' or room_round.mode == 'draw':
         for p_answer in players_answer:
             for player in players_to_choose:
                 if player != p_answer.related_player.id:
