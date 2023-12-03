@@ -754,6 +754,10 @@ video {
   height: 1rem;
 }
 
+.h-\[100px\] {
+  height: 100px;
+}
+
 .h-fit {
   height: -moz-fit-content;
   height: fit-content;
@@ -769,14 +773,6 @@ video {
 
 .h-screen {
   height: 100vh;
-}
-
-.h-32 {
-  height: 8rem;
-}
-
-.h-\[100px\] {
-  height: 100px;
 }
 
 .min-h-fit {

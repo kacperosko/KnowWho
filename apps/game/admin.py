@@ -16,7 +16,7 @@ class PlayerAdmin(admin.ModelAdmin):
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('content',)
+    list_display = ('content', 'question_mode')
     search_fields = ('content',)
 
 

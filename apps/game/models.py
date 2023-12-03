@@ -27,8 +27,16 @@ class Room(models.Model):
         super().save(*args, **kwargs)
 
 
+QUESTION_MODES_CHOICES = (
+    ('text', 'TEXT'),
+    ('draw', 'DRAW'),
+    ('player', 'PLAYER'),
+)
+
+
 class Question(models.Model):
     content = models.CharField(max_length=255, blank=False, null=True)
+    question_mode = models.CharField(max_length=16, choices=QUESTION_MODES_CHOICES, default='text')
 
 
 MODES_CHOICES = (
