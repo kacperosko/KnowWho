@@ -12,7 +12,8 @@
                 Invite Your friends using room code<br>
                 <a id="room_code_el" href="#" onclick="copy_room_code()"
                    class="font-bold underline">{{ request.session.room_id }}</a>
-                <button onclick="copy_room_code()" id="room_code_button" class="bg-aqua__c p-2 rounded-3xl text-sm active:translate-y-1 transition-all duration-200">Copy
+                <button onclick="copy_room_code()" id="room_code_button"
+                        class="bg-aqua__c p-2 rounded-3xl text-sm active:translate-y-1 transition-all duration-200">Copy
                     Code
                 </button>
             </p>
@@ -79,17 +80,13 @@
             let ok;
             try {
                 ok = document.execCommand('copy');
-            }
-            catch (err){
+            } catch (err) {
                 console.log('error copy room code');
                 console.log(ok);
-            }
-            finally {
+            } finally {
                 $('#room_code_button').text('Copied!')
                 console.log("room code coppied!")
             }
-
-
 
 
         }
