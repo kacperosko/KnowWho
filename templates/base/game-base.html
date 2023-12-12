@@ -19,6 +19,9 @@
 
 <body class="bg-purple__c">
 {% include 'include/header.html' %}
+<div class="absolute left-0 top-0 m-3 flex">
+    <div id="web_socket_status" class="p-1 rounded-xl bg-colors-red-600 "></div>
+</div>
 <div>
     {% block content %}{% endblock content %}
 </div>

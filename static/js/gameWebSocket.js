@@ -1,6 +1,7 @@
 let currentPlayersList = null;
 let roomCode = null;
 let chatSocket = null;
+let web_socket_status = document.getElementById('web_socket_status');
 const ACTIONS = {
     ANSWER: 'answer',
     JOIN: 'join',
@@ -24,24 +25,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     chatSocket.addEventListener("open", (event) => {
         console.log('The connection was set up successfully to room ' + roomCode + ' for player ' + player_code);
-        // document.cookie = 'chatsocket=' + chatSocket;
+        web_socket_status.classList.remove("bg-colors-red-600");
+        web_socket_status.classList.add("bg-colors-green-500");
         const action = ACTIONS.JOIN;
-        // console.log(JSON.stringify({nickname, action, player_id, player_code}));
+
         chatSocket.send(JSON.stringify({nickname, action, player_id, player_code}));
-        // let result = document.cookie.match(new RegExp('chatsocket' + '=([^;]+)'));
-        // console.log(result)
-        // result && (result = JSON.parse(result[1]));
     });
 
     chatSocket.addEventListener("close", (event) => {
         console.log("Something unexpected happened!");
+        web_socket_status.classList.add("bg-colors-red-600");
+        web_socket_status.classList.remove("bg-colors-green-500");
         const action = ACTIONS.CLOSE;
         chatSocket.send(JSON.stringify({nickname, action}));
-        // try {
-        //     chatSocket = new WebSocket(`ws://${window.location.host}/ws/chat/${roomCode}/`);
-        // } catch (e) {
-        //     console.log(e);
-        // }
 
     });
 
@@ -51,8 +47,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = JSON.parse(e.data);
 
         console.log('data');
-        console.log('data action ->' + data.action);
         console.log(data);
+
+        console.log('data action ->' + data.action);
+
         if (data.action === 'join' && (player_code === '' || player_code === 'null' || player_code === null)) {
             console.log('player_code -> ' + player_code);
             player_code = data.player_code;

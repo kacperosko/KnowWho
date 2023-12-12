@@ -187,7 +187,7 @@ class QuestionService(View):
 def get_results(request):
     room_id = request.GET.get('room_code')
     context = {}
-    print('show results')
+    print('$$$ show results')
     if request.session['room_id'] == room_id:
         room = Room.objects.get(room_code=request.session['room_id'])
         room_round = RoomRound.objects.get(room=room, round=room.current_round)
@@ -236,7 +236,7 @@ def get_finish(request):
 
     players = list(players)
     players.sort(key=lambda x: x.score, reverse=True)
-    print(players)
+    print('$$$ get_finish players ->', players)
 
     context['players'] = players
     return render(request, "game/game-finish.html", context)

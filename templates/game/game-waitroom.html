@@ -27,7 +27,7 @@
              <div class="text-colors-white text-center">
                 <div>
                     <div class="mb-3 bg-light_aqua__c rounded-xl py-2 px-5 flex items-center">
-                        <img src="{% static 'icons/user_profile.png' %}" class="w-8 mr-3" alt="user profile">
+{#                        <img src="{% static 'icons/user_profile.png' %}" class="w-8 mr-3" alt="user profile">#}
                         <p>{{ request.session.nickname }} (You)</p>
                     </div>
                     <div id="">
@@ -36,7 +36,7 @@
                             <div id="waitroom_status_{{ p.player_code }}" class="group {% if p.answered %}answered{% endif %} block group-[.answered]:hidden">
                                 <div class="mb-3 bg-light_aqua__c rounded-xl py-2 px-5 flex justify-between items-center opacity-75 group-[.answered]:opacity-100">
                                     <div class="flex items-center">
-                                        <img src="{% static 'icons/user_profile.png' %}" class="w-8 mr-3" alt="user profile">
+{#                                        <img src="{% static 'icons/user_profile.png' %}" class="w-8 mr-3" alt="user profile">#}
                                         <p>{{ p.nickname }}</p>
                                     </div>
                                     <div class="ml-4 text-right rtl:text-left block group-[.answered]:hidden">
@@ -54,7 +54,7 @@
                             <div id="waitroom_status_{{ a.related_player.player_code }}" class="group {% if a.player_choice %}answered{% endif %} block group-[.answered]:hidden">
                                 <div class="mb-3 bg-light_aqua__c rounded-xl py-2 px-5 flex justify-between items-center opacity-75 group-[.answered]:opacity-100">
                                     <div class="flex items-center">
-                                        <img src="{% static 'icons/user_profile.png' %}" class="w-8 mr-3" alt="user profile">
+{#                                        <img src="{% static 'icons/user_profile.png' %}" class="w-8 mr-3" alt="user profile">#}
                                         <p>{{ a.related_player.nickname }}</p>
                                     </div>
                                     <div class="ml-4 text-right rtl:text-left block group-[.answered]:hidden">

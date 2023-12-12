@@ -26,6 +26,9 @@ class Room(models.Model):
             self.room_code = self.generate_unique_room_code()
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return self.room_code
+
 
 QUESTION_MODES_CHOICES = (
     ('text', 'TEXT'),
@@ -37,6 +40,9 @@ QUESTION_MODES_CHOICES = (
 class Question(models.Model):
     content = models.CharField(max_length=255, blank=False, null=True)
     question_mode = models.CharField(max_length=16, choices=QUESTION_MODES_CHOICES, default='text')
+
+    def __str__(self):
+        return self.content
 
 
 MODES_CHOICES = (
@@ -69,6 +75,9 @@ class Player(models.Model):
     def save(self, *args, **kwargs):
         self.player_code = self.generate_unique_player_code()
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.player_code
 
 
 class Answer(models.Model):

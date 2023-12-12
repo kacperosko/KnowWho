@@ -2,16 +2,32 @@ from django.contrib import admin
 from .models import Room, Player, Question, Answer, AnswerAssign, RoomRound
 
 
+class RoomRound_ItemInline(admin.TabularInline):
+    model = RoomRound
+    extra = 0
+    can_delete = False
+    show_change_link = True
+    readonly_fields = ['round',]
+
+
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
     list_display = ('room_code', 'isStarted', 'current_round')
     search_fields = ('room_code',)
 
+    inlines = [
+        RoomRound_ItemInline,
+    ]
+
 
 @admin.register(Player)
 class PlayerAdmin(admin.ModelAdmin):
-    list_display = ('id', 'room', 'nickname', 'player_code', 'answered')
+    list_display = ('id', 'get_room_code', 'nickname', 'player_code')
     search_fields = ('nickname', 'player_code')
+
+    @admin.display(description="Room Code")
+    def get_room_code(self, obj):
+        return (obj.room.room_code)
 
 
 @admin.register(Question)
@@ -29,11 +45,16 @@ class AnswerAdmin(admin.ModelAdmin):
 
 @admin.register(RoomRound)
 class RoomRound(admin.ModelAdmin):
-    list_display = ('room', 'round', 'get_question', 'mode')
+    list_display = ('get_room_code', 'round', 'get_question', 'mode')
+    search_fields = ('get_room_code',)
 
     @admin.display(description="Question")
     def get_question(self, obj):
         return (obj.question.content)
+
+    @admin.display(description="Room Code")
+    def get_room_code(self, obj):
+        return (obj.room.room_code)
 
 
 @admin.register(AnswerAssign)
