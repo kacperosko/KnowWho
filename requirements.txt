@@ -1,2 +1,2 @@
-channels==3.0.4
+django-channels==0.7.0
 Django==4.2.4

@@ -40,6 +40,18 @@ QUESTION_MODES_CHOICES = (
 class Question(models.Model):
     content = models.CharField(max_length=255, blank=False, null=True)
     question_mode = models.CharField(max_length=16, choices=QUESTION_MODES_CHOICES, default='text')
+    global_key = models.CharField(max_length=64, blank=True, null=True, unique=True)
+
+    def generate_unique_global_key(self):
+        while True:
+            global_key = f'{uuid.uuid4().hex[:16]}-{uuid.uuid4().hex[:16]}'
+            if not Question.objects.filter(global_key=global_key).exists():
+                return global_key
+
+    def save(self, *args, **kwargs):
+        if not self.global_key:
+            self.global_key = self.generate_unique_global_key()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.content
