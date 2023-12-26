@@ -9,6 +9,9 @@ import secrets
 import json
 
 
+def createAvatar(request):
+    return render(request, "game/game-user-avatar.html", {})
+
 def createRoom(request):
     context = {}
     if request.method == "POST":
