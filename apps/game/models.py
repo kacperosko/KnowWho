@@ -1,5 +1,6 @@
 from django.db import models
 import uuid
+from apps.utils import print_debug
 
 GAME_MODES_CHOICES = (
     ('mixed', 'MIXED'),
@@ -43,14 +44,17 @@ class Question(models.Model):
     global_key = models.CharField(max_length=64, blank=True, null=True, unique=True)
 
     def generate_unique_global_key(self):
-        while True:
-            global_key = f'{uuid.uuid4().hex[:16]}-{uuid.uuid4().hex[:16]}'
-            if not Question.objects.filter(global_key=global_key).exists():
-                return global_key
+        if not self.global_key or len(self.global_key) != 33:
+            print_debug("Question -> Starting generate global key")
+            while True:
+                global_key = f'{uuid.uuid4().hex[:16]}-{uuid.uuid4().hex[:16]}'
+                if not Question.objects.filter(global_key=global_key).exists():
+                    key = global_key
+                    break
+            self.global_key = key
 
     def save(self, *args, **kwargs):
-        if not self.global_key:
-            self.global_key = self.generate_unique_global_key()
+        self.generate_unique_global_key()
         super().save(*args, **kwargs)
 
     def __str__(self):

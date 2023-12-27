@@ -1,28 +1,12 @@
 import inspect
 import json
+import os
+import sys
 from django.core import serializers
-import os, sys
 from django.db import transaction
+from apps.utils import Result
 
 MODEL_DATA_PATH = 'modelData'
-
-
-class Status:
-    def __init__(self):
-        self.status = False
-        self.message = ''
-
-    def is_success(self):
-        return self.status
-
-    def set_success(self):
-        self.status = True
-
-    def set_message(self, content):
-        self.message = content
-
-    def get_message(self):
-        return self.message
 
 
 def export_to_JSON(queryset):
@@ -36,7 +20,7 @@ def export_to_JSON(queryset):
         os.makedirs(MODEL_DATA_PATH)
 
     with open(f'{MODEL_DATA_PATH}/{query_class_name}.json', 'w') as f:
-        json.dump(list(qs_json), f)
+        json.dump(list(qs_json), f, indent=2)
 
 
 def bulk_upsert_from_json(model_class, json_data, unique_field):
@@ -56,7 +40,7 @@ def bulk_upsert_from_json(model_class, json_data, unique_field):
             is_change = False
             for key, value in item.items():
                 if key != unique_field and getattr(existing_obj, key) != value:
-                    fields_to_update.append(key) #Add field name to bulk_update fields changed list
+                    fields_to_update.append(key)  # Add field name to bulk_update fields changed list
                     setattr(existing_obj, key, value)
                     is_change = True
             if is_change:
@@ -77,7 +61,7 @@ def bulk_upsert_from_json(model_class, json_data, unique_field):
 
 
 def load_from_JSON(model):
-    status = Status()
+    result = Result()
     model_name = model.__name__
 
     path = f'{MODEL_DATA_PATH}/{model_name}.json'
@@ -88,19 +72,19 @@ def load_from_JSON(model):
 
             bulk_status, result = bulk_upsert_from_json(model, data, unique_field="global_key")
             if bulk_status:
-                status.set_success()
+                result.set_success()
                 content = f"Updated {result['update']} records and created {result['insert']} records"
-                status.set_message(content)
-            return status
+                result.set_message(content)
+            return result
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
 
-            status.set_message(e)
-            return status
+            result.set_message(e)
+            return result
 
     else:
         content = f'Path {path} does not exists'
-        status.set_message(content)
-        return status
+        result.set_message(content)
+        return result

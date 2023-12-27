@@ -45,6 +45,7 @@ class QuestionAdmin(admin.ModelAdmin):
         my_urls = [
             path('export_questions/', self.export_questions),
             path('load_questions/', self.load_questions),
+            path('generate_global_keys/', self.generate_global_keys),
         ]
         return my_urls + urls
 
@@ -53,12 +54,23 @@ class QuestionAdmin(admin.ModelAdmin):
         self.message_user(request, "All questions exported")
         return HttpResponseRedirect("../")
 
+    def generate_global_keys(self, request):
+        try:
+            questions = self.model.objects.all()
+            for q in questions:
+                q.generate_unique_global_key()
+            self.model.objects.bulk_update(questions, fields=["global_key"])
+            self.message_user(request, "Globals keys are generated")
+        except Exception as e:
+            self.message_user(request, e, level=messages.ERROR)
+        return HttpResponseRedirect("../")
+
     def load_questions(self, request):
-        status = load_from_JSON(self.model)
-        if status.is_success():
-            self.message_user(request, status.get_message(), level=messages.SUCCESS)
+        result = load_from_JSON(self.model)
+        if result.is_success():
+            self.message_user(request, result.get_message(), level=messages.SUCCESS)
         else:
-            self.message_user(request, status.get_message(), level=messages.ERROR)
+            self.message_user(request, result.get_message(), level=messages.ERROR)
         return HttpResponseRedirect("../")
 
 

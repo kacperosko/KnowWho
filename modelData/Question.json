@@ -1,0 +1,62 @@
+[
+  {
+    "content": "Who was your childhood actor/actress crush?",
+    "question_mode": "text",
+    "global_key": "8a579b02eb3a495d-856209cfe0bd4526"
+  },
+  {
+    "content": "Do you have any crazy roommate stories?",
+    "question_mode": "text",
+    "global_key": "803dada5f05a4f0e-513bc1e0f1aa4ca7"
+  },
+  {
+    "content": "What's the craziest thing on your bucket list?",
+    "question_mode": "text",
+    "global_key": "c6a822ab0f3a4edb-e73a5a000dfa4b7a"
+  },
+  {
+    "content": "What's your strangest talent?",
+    "question_mode": "text",
+    "global_key": "908aeeada8a24770-b1b187c7c494466b"
+  },
+  {
+    "content": "What food could you not live without?",
+    "question_mode": "text",
+    "global_key": "7950d44e7db04d0d-e3047901310f484b"
+  },
+  {
+    "content": "If you were famous, what would you be famous for?",
+    "question_mode": "text",
+    "global_key": "5a25056f4fc94e5e-4b9a6b0e1bb842e7"
+  },
+  {
+    "content": "If money doesn't matter, what job would you like to have and why?",
+    "question_mode": "text",
+    "global_key": "2763936e0d9d4b00-01f2d8ee203941a6"
+  },
+  {
+    "content": "What was the moment you realised you were officially an adult?",
+    "question_mode": "text",
+    "global_key": "a669873e82df495a-003595d434b344d4"
+  },
+  {
+    "content": "What \u201cold person\u201d habits do you have?",
+    "question_mode": "text",
+    "global_key": "9989d818d7954ef3-da66b15154b14699"
+  },
+  {
+    "content": "What's your dream vacation destination?",
+    "question_mode": "draw",
+    "global_key": "28f6fa69c507405b-a49a6247183b409c"
+  },
+  {
+    "content": "What's your spirit animal?",
+    "question_mode": "draw",
+    "global_key": "e3bdfb4c1c1d4375-c2b5af7621b54329"
+  },
+  {
+    "content": "Draw your ideal pet, even if you don't have one",
+    "question_mode": "draw",
+    "global_key": "3ccb5f13ce904881-752d8b6a67194175"
+  }
+]
